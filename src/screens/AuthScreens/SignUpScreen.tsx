@@ -8,17 +8,144 @@ import { colors } from "../../assets/colors/Colors";
 import { ScreenHeight, ScreenWidth } from "../../utils/dimensions";
 
 import LottieView from 'lottie-react-native';
-import { Formik } from "formik";
+import { Formik, FormikErrors, FormikTouched, FormikValues } from "formik";
 import { signupValidationSchema } from "../../validators/FormValidators";
 import { useFonts, Inter_300Light } from "@expo-google-fonts/inter";
 import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "react-native";
 
 import { Options, Select } from "../../components/SelectList";
+import { FormInputList } from "../../components/InputListShow";
+
+
+interface AddressProps {
+    city?: string,
+    state?: string,
+    street?: string,
+    cep?: string,
+    location?: string
+}
+
+function AddressContainer(
+    props: {
+        values: FormikValues, 
+        errors: FormikErrors<any>,
+        styles?: any,
+        touched: FormikTouched<any>,
+        setFieldValue(input: string, _:string): any,
+        handleChange(input: string): any,
+        handleBlur(input: string): any,
+    }) {
+    const { values, errors, touched } = props;
+
+    return (
+        <View
+            style={[props?.styles, {
+                width: "90%",
+                backgroundColor: "#444",
+
+                paddingBottom: 10,
+                borderBottomLeftRadius: 10,
+                borderBottomRightRadius: 10
+            }]}
+        >
+            <Input 
+                type="text"
+                placeholder="Cidade"
+                iconRight={
+                    !errors?.address?.city ? "checkmark-outline"
+                    : values.address.city == "" ? "" : "close-outline"
+                }
+                iconPress={() => props?.setFieldValue("address.city", "")}
+                onChangeText={props?.handleChange("address.city")}
+                onBlur={props?.handleBlur("address.city")}
+                value={values.address.city}
+                styleProps={{width: "100%", borderRadius: 0}}
+            />
+            {(errors.address?.city && touched.address?.city) &&
+                <View style={[styles.errorsContainer, {paddingStart: 10}]}>
+                    <Text style={styles.errors}>{errors.address?.city}</Text>
+                </View>
+            }
+            <Input 
+                type="text"
+                placeholder="Estado - Ex. Ceará"
+                iconRight={
+                    !errors?.address?.state ? "checkmark-outline"
+                    : values.address.state == "" ? "" : "close-outline"
+                }
+                iconPress={() => props?.setFieldValue("address.state", "")}
+                onChangeText={props?.handleChange("address.state")}
+                onBlur={props?.handleBlur("address.state")}
+                value={values.address.state}
+                styleProps={{width: "100%", borderRadius: 0}}
+            />
+            {(errors.address?.state && touched.address?.state) &&
+                <View style={[styles.errorsContainer, {paddingStart: 10}]}>
+                    <Text style={styles.errors}>{errors.address?.state}</Text>
+                </View>
+            }
+            <Input 
+                type="text"
+                placeholder="Rua"
+                iconRight={
+                    !errors?.address?.street ? "checkmark-outline"
+                    : values.address.street == "" ? "" : "close-outline"
+                }
+                iconPress={() => props?.setFieldValue("address.street", "")}
+                onChangeText={props?.handleChange("address.street")}
+                onBlur={props?.handleBlur("address.street")}
+                value={values.address.street}
+                styleProps={{width: "100%", borderRadius: 0}}
+            />
+            {(errors.address?.street && touched.address?.street) &&
+                <View style={[styles.errorsContainer, {paddingStart: 10}]}>
+                    <Text style={styles.errors}>{errors.address?.street}</Text>
+                </View>
+            }
+
+            <Input 
+                type="number"
+                placeholder="CEP"
+                iconRight={
+                    !errors.address?.cep ? "checkmark-outline"
+                    : values.address?.cep == "" ? "" : "close-outline"
+                }
+                iconPress={() => props?.setFieldValue("address.cep", "")}
+                onChangeText={props?.handleChange("address.cep")}
+                onBlur={props?.handleBlur("address.cep")}
+                value={values.address.cep}
+                styleProps={{width: "100%", borderRadius: 0, elevation: 0}}
+            />
+            {(errors.address?.cep && touched.address?.cep) &&
+                <View style={[styles.errorsContainer, {paddingStart: 10}]}>
+                    <Text style={styles.errors}>{errors.address?.cep}</Text>
+                </View>
+            }
+            <Input 
+                type="text"
+                placeholder="Bairro"
+                iconRight={
+                    !errors.address?.location ? "checkmark-outline"
+                    : values.address?.location == "" ? "" : "close-outline"
+                }
+                iconPress={() => props?.setFieldValue("address.location", "")}
+                onChangeText={props?.handleChange("address.location")}
+                onBlur={props?.handleBlur("address.location")}
+                value={values.address.location}
+                styleProps={{width: "100%", borderRadius: 0, elevation: 0}}
+            />
+            {(errors.address?.location && touched.address?.location) &&
+                <View style={[styles.errorsContainer, {paddingStart: 10}]}>
+                    <Text style={styles.errors}>{errors.address?.location}</Text>
+                </View>
+            }
+        </View>
+    )
+}
 
 
 export default function SignUp() {
-
     const { signUp } = useContext(AuthContext);
 
     const [fontsLoaded] = useFonts({
@@ -35,22 +162,24 @@ export default function SignUp() {
     const [ showPassword, setShowPassword ] = useState(false);
     const [ showConfirmPassword, setShowConfirmPassword ] = useState(false);
 
+    const [ isOpen, setIsOpen ] = useState(false);
+
+
     async function handleSubmitSignIn(
         values: {
             name: string, 
             email:string, 
             cpf: string, 
-            address: string,
+            address: AddressProps,
             password: string, 
             confirmPassword: string
         }) {
         const {name, email, cpf, address, password, confirmPassword} = values;
 
-        console.log({name, email, cpf, address, selectedAccountOption, password, confirmPassword})
+        console.log("Values: ", values)
 
         if(name.length > 0 || email.length > 0 &&
-            cpf.length > 0 && address.length > 0 &&
-            password.length > 0 && confirmPassword.length > 0) {
+            cpf.length > 0 && password.length > 0 && confirmPassword.length > 0) {
             if (password === confirmPassword) {
                 // const response = await signUp(email, password, name);
         
@@ -146,16 +275,31 @@ export default function SignUp() {
                 >
                     <Animated.View style={[styles.container, { opacity: opacity, transform: [{ translateY: offset.y }] }]}>                        
                         <Formik 
-                            initialValues={{name: "", email:"", cpf: "", address: "", password:"", confirmPassword:""}}
+                            initialValues={{
+                                name: "", 
+                                email:"", 
+                                cpf: "", 
+                                address: {} as AddressProps,
+                                password:"", 
+                                confirmPassword:""
+                            }}
                             validateOnChange={true}
                             validateOnMount={true}
-                            onSubmit={(values) => {
-                                // console.log(values)
-                                handleSubmitSignIn(values)}}
+                            onSubmit={(values) => handleSubmitSignIn(values)}
                             validationSchema={signupValidationSchema}
                         >
                             {
-                                ({ handleChange, handleBlur, handleSubmit, values, touched, errors, setFieldTouched, setFieldValue}) => (
+                                ({ 
+                                    handleChange, 
+                                    handleBlur, 
+                                    handleSubmit, 
+                                    values, 
+                                    touched, 
+                                    errors, 
+                                    isValid,
+                                    setFieldTouched, 
+                                    setFieldValue
+                                }) => (
                                     <>
                                     
                                         <Input 
@@ -217,43 +361,42 @@ export default function SignUp() {
                                                 <Text style={styles.errors}>{errors.cpf}</Text>
                                             </View>
                                         }
-                                        <Input 
-                                            type="text"
-                                            placeholder="Endereço"
+
+                                        <FormInputList 
                                             icon="home-outline"
-                                            iconRight={
-                                                !errors.address ? "checkmark-outline"
-                                                : values.address == "" ? "" : "close-outline"
-                                            }
-                                            iconPress={() => setFieldValue("address", "")}
-                                            onChangeText={handleChange("address")}
-                                            onBlur={handleBlur("address")}
-                                            value={values.address}
-                                            styleProps={{marginTop: 20, marginBottom: 0}}
+                                            placeholder="Endereço"
+                                            style={{marginTop: 20}}
+                                            isOpen={isOpen}
+                                            onPress={()=> setIsOpen(!isOpen)}
                                         />
+
+                                        {isOpen && <AddressContainer 
+                                            values={values} 
+                                            errors={errors}
+                                            touched={touched}
+                                            setFieldValue={setFieldValue}
+                                            handleBlur={handleBlur}
+                                            handleChange={handleChange}
+                                        />}
                                         {(errors.address && touched.address) &&
                                             <View style={styles.errorsContainer}>
-                                                <Text style={styles.errors}>{errors.address}</Text>
+                                                <Text style={styles.errors}>Por favor adicione um endereço</Text>
                                             </View>
                                         }
-
                                         <Select 
                                             icon="wallet-outline"
                                             placeholder="Tipo de conta"
                                             style={{marginTop: 20}}
                                             options={[
-                                                {
-                                                    title: "Corrente",
-                                                    id: "CC"
-                                                },
-                                                {
-                                                    title: "Poupança",
-                                                    id: "CP"
-                                                },
+                                                {title: "Corrente", id: "CC"},
+                                                {title: "Poupança", id: "CP"},
                                             ]}
-                                            getCurrentSelected={(option) => setSeletedAccountOption(option)}
+                                            currentValueSelected={selectedAccountOption}
+                                            getCurrentSelected={(option) => {
+                                                setSeletedAccountOption(option);
+                                            }}
                                         />
-                                        {(selectedAccountOption == undefined && formValidated) &&
+                                        {(selectedAccountOption === undefined) &&
                                             <View style={styles.errorsContainer}>
                                                 <Text style={styles.errors}>Por favor selecione um tipo de conta</Text>
                                             </View>
@@ -299,11 +442,11 @@ export default function SignUp() {
 
                                         <TouchableOpacity style={styles.submit}
                                             onPress={() => { 
-                                                (!errors.email && !errors.cpf
-                                                    && !errors.address && !errors.password && !errors.confirmPassword) 
-                                                    && selectedAccountOption?.title !== undefined && setFormValidated(true)
+                                                if(isValid && !selectedAccountOption === undefined) {
+                                                    setFormValidated(true)
+                                                }
+                                                handleSubmit();
                                             }}
-                                            onPressOut={() => formValidated && handleSubmit()}
                                         >
                                             <Text style={styles.submitText}>Enviar</Text>
                                         </TouchableOpacity>

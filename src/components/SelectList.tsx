@@ -13,7 +13,8 @@ interface SelectProps {
     placeholder?: string,
     options: Array<Options>,
     style? : any,
-    getCurrentSelected: (option: Options) => any
+    currentValueSelected?: Options,
+    getCurrentSelected: (option: Options) => any,
 }
 
 export function Select(props: SelectProps) {
