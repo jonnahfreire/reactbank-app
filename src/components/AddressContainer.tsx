@@ -13,12 +13,23 @@ export interface AddressProps {
     location?: string
 }
 
+interface FormikErrorProps {
+    name: string,
+    email: string,
+    cpf: string,
+    address: AddressProps,
+    password: string,
+    confirmPassword: string
+}
+
+interface FormikTouchedProps extends FormikErrorProps {};
+
 export function AddressContainer(
     props: {
         values: FormikValues, 
-        errors: FormikErrors<any>,
+        errors: FormikErrors<FormikErrorProps>,
         styles?: any,
-        touched: FormikTouched<any>,
+        touched: FormikTouched<FormikTouchedProps>,
         setFieldValue(input: string, _:string): any,
         handleChange(input: string): any,
         handleBlur(input: string): any,
