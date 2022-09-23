@@ -10,5 +10,8 @@ npm-debug.*
 *.orig.*
 web-build/
 
+src/screens/AppScreens/
+src/assets/img/
+
 # macOS
 .DS_Store
