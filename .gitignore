@@ -10,6 +10,8 @@ npm-debug.*
 *.orig.*
 web-build/
 
+img-screens/
+!img-screens/.gitkeep
 src/mocks/*
 # macOS
 .DS_Store
