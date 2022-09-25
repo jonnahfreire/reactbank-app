@@ -5,7 +5,7 @@ import { colors } from "../assets/colors/Colors";
 
 
 interface InputProps {
-    value: string,
+    value: string | undefined,
     type: string,
     placeholder?: string,
     icon?: any,

@@ -1,12 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useContext } from "react";
 import { Alert, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { colors } from "../../assets/colors/Colors";
+import { colors } from "../../../assets/colors/Colors";
 
-import { AuthContext } from "../../contexts/AuthContext";
-const UserImg = require('../../assets/img/user.png');
+import { AuthContext } from "../../../contexts/AuthContext";
+const UserImg = require('../../../assets/img/user.png');
 
-export default function Perfil() {
+export function UserPerfil() {
   const { signOut, authData } = useContext(AuthContext);
 
   function signOutFromAccount() {
@@ -27,26 +27,31 @@ export default function Perfil() {
           <Image source={UserImg} resizeMode="contain" style={{ width: 145, height: 200 }} />
           
           <View style={[styles.userInfoContainer]}>
-            <Text style={{ fontSize: 20, marginTop: 15 }}>Informações de cadastro</Text>
+            <Text style={{ color: "#DDD", fontSize: 20, marginTop: 15 }}>Informações de cadastro</Text>
             
-            {authData.name && <View
+            {authData?.name && <View
                 style={styles.infoContainer}
               >
-                <Ionicons name="person-outline" color='black' size={24} />
-                <Text style={{ marginLeft: 10, fontSize: 15 }}>{ authData.name }</Text>
+                <Ionicons name="person-outline" color='#DDD' size={24} />
+                <Text style={{ marginLeft: 10, fontSize: 15, color: '#DDD' }}>{ authData?.name }</Text>
+              </View>
+            }
+            {authData?.permission === "admin" && <View style={styles.infoContainer}>
+                <Ionicons name="settings-outline" color='#DDD' size={24} />
+                <Text style={{ marginLeft: 10, fontSize: 15, color: '#DDD' }}>Administador</Text>
               </View>
             }
             <View
               style={styles.infoContainer}
               >
-              <Ionicons name="mail-outline" color='black' size={24} />
-              <Text style={{ marginLeft: 10, fontSize: 15 }}>{ authData.email }</Text>
+              <Ionicons name="mail-outline" color='#DDD' size={24} />
+              <Text style={{ marginLeft: 10, fontSize: 15, color: '#DDD' }}>{ authData?.email }</Text>
             </View>
           </View>
 
             <TouchableOpacity style={styles.logoutButtton} onPress={signOutFromAccount}>
-              <Text style={{ fontSize: 16, fontWeight: "700", color: "#FFF", marginEnd: 15 }}>Sair</Text>
-              <Ionicons name="log-out-outline" color='white' size={26} />
+              <Text style={{ fontSize: 16, fontWeight: "700", color: "#DDD", marginEnd: 15 }}>Sair</Text>
+              <Ionicons name="log-out-outline" color='#DDD' size={26} />
             </TouchableOpacity>
         </View>
       </View>
@@ -59,7 +64,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "rgb(250, 250, 250)",
+    backgroundColor: colors.bgColor,
   },
   perfilInfoContainer: {
     flex: 1,
@@ -85,7 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     width: '100%',
     marginTop: 35,
-    backgroundColor: "#F0F0F0",
+    backgroundColor: "#444",
     padding: 5,
     borderRadius: 5,
     elevation: 3

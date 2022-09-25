@@ -67,7 +67,7 @@ export function AddressContainer(
             }
             <Input 
                 type="text"
-                placeholder="Estado - Ex. Ceará"
+                placeholder="Estado"
                 iconRight={
                     !errors?.address?.state ? "checkmark-outline"
                     : values.address.state == "" ? "" : "close-outline"
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     },
     errors: {
         fontFamily: 'Inter_600SemiBold',
-		color: colors.darkRed,
+		color: colors.lightRed,
         textAlign: 'left'
     }
 });

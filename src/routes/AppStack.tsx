@@ -1,49 +1,64 @@
-import React from 'react';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import React, { useContext, useEffect, useState } from 'react';
 
-import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-
-import Perfil from '../screens/AppScreens/PerfilScreen';
+import CustomHeader from '../components/CustomHeader';
 import { colors } from '../assets/colors/Colors';
+import { AuthContext } from '../contexts/AuthContext';
 
+import { UserHomeScreen } from '../screens/AppScreens/UserScreens/UserHomeScreen';
+import { UserPerfil } from '../screens/AppScreens/UserScreens/UserPerfilScreen';
+import { UserCardPresentationScreen } from '../screens/AppScreens/UserScreens/UserCardPresentationsScreen';
 
-const Tab = createMaterialBottomTabNavigator();
+import { AdminHomeScreen } from '../screens/AppScreens/AdminScreens/AdminHomeScreen';
+import { AdminPerfil } from '../screens/AppScreens/AdminScreens/AdminPerfilScreen';
+
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { UserCreateCardScreen } from '../screens/AppScreens/UserScreens/UserCreateCardScreen';
+
+const Stack = createNativeStackNavigator();
+
+const headerOptions = {
+    headerBackVisible: false,
+    headerShadowVisible: false,
+}
 
 export default function AppStack() {
+    const { authData } = useContext(AuthContext);
+
+    const [ initialUserRoute, setInitialUserRoute ] = useState("CardPresentation");
+    const [ isAdmin, setIsAdmin ] = useState(false);
+    const [ userHasCards, setUserHasCards ] = useState(false);
+
+    useEffect(() => {
+        authData?.permission === "admin"
+        && setIsAdmin(true);
+
+        if(authData?.cards !== undefined && authData.cards.length > 0) {
+            setInitialUserRoute("Home");
+            setUserHasCards(true)
+        }
+    }, []);
+
     return (
-        <Tab.Navigator 
-            initialRouteName="Courses"
-            activeColor={colors.lightBlue}
-            inactiveColor="rgb(180, 180, 180)"
-            shifting={true}
-            barStyle={{ 
-                backgroundColor: 'rgb(245, 245, 245)',
-                elevation: 0
-            }}
-        >
-            {/* <Tab.Screen 
-                name="Box" 
-                component={""} 
-                options={{
-                    title: "Ajuda",
-                    tabBarIcon: ({ color }) => (
-                        <MaterialCommunityIcons name="message-question-outline" color={color} size={26} />
-                    ),
-                    tabBarAccessibilityLabel: "Ajuda",
-                    tabBarLabel: "Ajuda"
-                }}
-            /> */}
-            <Tab.Screen 
-                name="Perfil" 
-                component={Perfil} 
-                options={{
-                    title: "Perfil",
-                    tabBarIcon: ({ color }) => (
-                        <Ionicons name="person-outline" color={color} size={26} />
-                    ),
-                    tabBarAccessibilityLabel: "Perfil"
-                }}
-            />
-        </Tab.Navigator>
+        <>
+            {isAdmin ? (
+                <Stack.Navigator initialRouteName='Home'>
+                    <Stack.Screen name="AdminHome" component={AdminHomeScreen} options={{headerShown: false}}/>
+                    <Stack.Screen name="AdminPerfil" component={AdminPerfil} 
+                        options={{ headerTitle: ()=> <CustomHeader iconColor='#CCC' />, headerStyle: {backgroundColor: colors.bgColor}, ...headerOptions}}
+                    />
+                </Stack.Navigator>
+            ) : (
+                <Stack.Navigator initialRouteName={initialUserRoute}>
+                    <Stack.Screen name="Home" component={UserHomeScreen} options={{headerShown: false}}/>
+                    {!userHasCards && <Stack.Screen name="CardPresentation" component={UserCardPresentationScreen} options={{headerShown: false}}/>}
+                    <Stack.Screen name="CreateCard" component={UserCreateCardScreen} 
+                        options={{ headerTitle: ()=> <CustomHeader iconColor='#CCC' />, headerStyle: {backgroundColor: colors.bgColor}, ...headerOptions}}
+                    />
+                    <Stack.Screen name="Perfil" component={UserPerfil} 
+                        options={{ headerTitle: ()=> <CustomHeader iconColor='#CCC' />, headerStyle: {backgroundColor: colors.bgColor}, ...headerOptions}}
+                    />
+                </Stack.Navigator>
+            )}
+        </>
     );
 }

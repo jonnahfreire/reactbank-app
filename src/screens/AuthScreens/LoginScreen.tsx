@@ -29,7 +29,7 @@ import { loginValidationSchema } from "../../validators/FormValidators";
 export default function Login(props: {navigation: any}) {
     const { navigation } = props;
     
-    const { signIn } = useContext(AuthContext);
+    const { signIn, setUserSigned } = useContext(AuthContext);
 
     const [fontsLoaded] = useFonts({
         Inter_300Light,
@@ -84,14 +84,18 @@ export default function Login(props: {navigation: any}) {
 
     async function handleSubmitLogin(values: {cpf: string, password: string}) {
         const { cpf, password } = values;
-        console.log(cpf, password);
-        // const response = await signIn(cpf, password)
         
-        // if(response.error) {
-        //     Alert.alert("Desculpe! Não foi possível fazer login!", response.message);
-        // } else {
-        //     formValidatedRef.current.value = true;
-        // }
+        const response = await signIn(cpf.replace(/\D/g, ''), password)
+        
+        if(response.error) {
+            Alert.alert("Desculpe! Não foi possível fazer login!", response?.message);
+        } else {
+            formValidatedRef.current.value = true;
+            setTimeout(() => 
+                setUserSigned(true),
+                2000
+            )
+        }
     }
 
     function handleSignUpRedirect() {
@@ -210,7 +214,7 @@ export default function Login(props: {navigation: any}) {
                                             ) : (
                                             
                                                 <View style={{width: 45, height: 45}}>
-                                                    <LottieView resizeMode="cover" autoPlay source={require('../../assets/animated/bouncing-balls.json')} />
+                                                    <LottieView resizeMode="cover" autoPlay source={require('../../assets/animated/spinner.json')} />
                                                 </View>
                                             )
                                         }
@@ -300,6 +304,7 @@ const styles = StyleSheet.create({
     errors: {
         fontFamily: 'Inter_600SemiBold',
 		color: colors.lightRed,
-        textAlign: 'left'
+        textAlign: 'left',
+        marginStart: 5
     }
 });

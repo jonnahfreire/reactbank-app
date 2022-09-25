@@ -5,9 +5,7 @@ import Input from "../../components/Input";
 import { AuthContext } from "../../contexts/AuthContext";
 
 import { colors } from "../../assets/colors/Colors";
-import { ScreenHeight, ScreenWidth } from "../../utils/dimensions";
-
-import LottieView from 'lottie-react-native';
+import { ScreenWidth } from "../../utils/dimensions";
 import { Formik } from "formik";
 import { signupValidationSchema } from "../../validators/FormValidators";
 import { useFonts, Inter_300Light } from "@expo-google-fonts/inter";
@@ -18,9 +16,11 @@ import { Options, Select } from "../../components/SelectList";
 import { FormInputList } from "../../components/InputListShow";
 import { AddressContainer, AddressProps } from "../../components/AddressContainer";
 
+import LottieView from 'lottie-react-native';
+
 
 export default function SignUp() {
-    const { signUp } = useContext(AuthContext);
+    const { signUp, setUserSigned } = useContext(AuthContext);
 
     const [fontsLoaded] = useFonts({
         Inter_300Light,
@@ -28,41 +28,34 @@ export default function SignUp() {
 
     const [ offset ] = useState(new Animated.ValueXY({x: 0, y: 80}));
     const [ opacity ] = useState(new Animated.Value(0))
-    const [ logoContainer ] = useState(new Animated.ValueXY({x:ScreenWidth, y: ScreenHeight / 4}))
+    const [ logoContainer ] = useState(new Animated.ValueXY({x:ScreenWidth, y: 200}))
     const [ keyboardShown, setKeyboardShown ] = useState(false);
     const [ selectedAccountOption, setSeletedAccountOption ] = useState<Options>();
+    const [ notSelectedAccount, setNotSelectedAccount ] = useState(true);
 
     const [ formValidated, setFormValidated ] = useState(false);
     const [ showPassword, setShowPassword ] = useState(false);
     const [ showConfirmPassword, setShowConfirmPassword ] = useState(false);
-
     const [ isOpen, setIsOpen ] = useState(false);
 
 
-    async function handleSubmitSignIn(
-        values: {
-            name: string, 
-            email:string, 
-            cpf: string, 
-            address: AddressProps,
-            password: string, 
-            confirmPassword: string
-        }) {
-        const {name, email, cpf, address, password, confirmPassword} = values;
-
-        console.log("Values: ", values)
-
-        if(name.length > 0 || email.length > 0 &&
-            cpf.length > 0 && password.length > 0 && confirmPassword.length > 0) {
-            if (password === confirmPassword) {
-                // const response = await signUp(email, password, name);
-        
-                // if(response.error) {
-                //     Alert.alert("Desculpe! Não foi possível cadastrar!", response.error.message);
-                // } else {
-                //     setFormValidated(false);
-                // }
+    async function handleSubmitSignIn(signUpData: any) {
+        if(selectedAccountOption !== undefined) {
+            const data = signUpData;
+            const cpf = data.cpf.replace(/\D/g,'')
+            data.cpf = cpf;
+            const response = await signUp({...data, account: selectedAccountOption});
+            
+            if(response.error) Alert.alert("Desculpe! Não foi possível cadastrar!", response?.message)
+            else {
+                setFormValidated(true);
+                setTimeout(() => 
+                    setUserSigned(true),
+                2000
+            )
             }
+        } else {
+            Alert.alert("Atenção!", "Selecione um tipo de conta");
         }
     }
 
@@ -76,7 +69,7 @@ export default function SignUp() {
             useNativeDriver: false,
         }),
         Animated.timing(logoContainer.y, {
-            toValue: 100,
+            toValue: 170,
             duration: 100,
             useNativeDriver: false,
         })
@@ -93,7 +86,7 @@ export default function SignUp() {
                 useNativeDriver: false,
             }),
             Animated.timing(logoContainer.y, {
-                toValue: ScreenHeight / 4,
+                toValue: 200,
                 duration: 100,
                 useNativeDriver: false,
             })
@@ -133,12 +126,10 @@ export default function SignUp() {
                 <StatusBar style="light"/>
                 <Animated.View style={[styles.containerLogo,
                     {width: logoContainer.x, height: logoContainer.y}]}>
-                    
-                    <View style={{width: '80%', height: keyboardShown ? "50%" : "70%"}}>
-                        <LottieView resizeMode="contain" autoPlay source={require('../../assets/animated/banking.json')} />
-                    </View>
-                    <Text style={{color: "#DDD", fontSize: 26, fontFamily: 'Inter_600SemiBold'}}>
-                        ReactBank
+                    <Text style={{color: "#DDD", fontSize: 30, fontFamily: 'Inter_600SemiBold'}}>Olá,</Text>
+                    <Text style={{color: "#DDD", fontSize: 20, marginTop: 10, fontFamily: 'Inter_600SemiBold'}}>Bem vindo ao ReactBank</Text>
+                    <Text style={{color: "rgb(170, 170, 170)", marginTop: 5, fontSize: 16, fontFamily: 'Inter_600SemiBold'}}>
+                        Informe os dados abaixo para realizar seu cadastro
                     </Text>
                 </Animated.View>
 
@@ -150,7 +141,7 @@ export default function SignUp() {
                     <Animated.View style={[styles.container, { opacity: opacity, transform: [{ translateY: offset.y }] }]}>                        
                         <Formik 
                             initialValues={{
-                                name: "", 
+                                username: "", 
                                 email:"", 
                                 cpf: "", 
                                 address: {} as AddressProps,
@@ -171,7 +162,6 @@ export default function SignUp() {
                                     touched, 
                                     errors, 
                                     isValid,
-                                    setFieldTouched, 
                                     setFieldValue
                                 }) => (
                                     <>
@@ -181,20 +171,20 @@ export default function SignUp() {
                                             placeholder="Nome completo"
                                             icon="person-outline"
                                             iconRight={
-                                                !errors.name ? "checkmark-outline"
-                                                : !touched.email ? "" : "close-outline"
+                                                !errors.username ? "checkmark-outline"
+                                                : !touched.username ? "" : "close-outline"
                                             }
-                                            iconPress={() => setFieldValue("name", "")}
-                                            onChangeText={handleChange("name")}
+                                            iconPress={() => setFieldValue("username", "")}
+                                            onChangeText={handleChange("username")}
                                             onBlur={() => {
-                                                handleBlur("name")
-                                                setFieldTouched("name", false)
+                                                handleBlur("username")
+                                                // setFieldTouched("username", false)
                                             }}
-                                            value={values.name}
+                                            value={values.username}
                                         />
-                                        {(errors.name && touched.name) &&
+                                        {(errors.username && touched.username) &&
                                             <View style={styles.errorsContainer}>
-                                                <Text style={styles.errors}>{errors.name}</Text>
+                                                <Text style={styles.errors}>{errors.username}</Text>
                                             </View>
                                         }
                                         <Input 
@@ -254,7 +244,7 @@ export default function SignUp() {
                                         />}
                                         {(errors.address && touched.address) &&
                                             <View style={styles.errorsContainer}>
-                                                <Text style={styles.errors}>Por favor adicione um endereço</Text>
+                                                <Text style={styles.errors}>Adicione um endereço</Text>
                                             </View>
                                         }
                                         <Select 
@@ -270,9 +260,9 @@ export default function SignUp() {
                                                 setSeletedAccountOption(option);
                                             }}
                                         />
-                                        {(selectedAccountOption === undefined) &&
+                                        {(!notSelectedAccount && formValidated) &&
                                             <View style={styles.errorsContainer}>
-                                                <Text style={styles.errors}>Por favor selecione um tipo de conta</Text>
+                                                <Text style={styles.errors}>Selecione um tipo de conta</Text>
                                             </View>
                                         }
                                         <Input
@@ -315,14 +305,18 @@ export default function SignUp() {
                                         }
 
                                         <TouchableOpacity style={styles.submit}
-                                            onPress={() => { 
-                                                if(isValid && !selectedAccountOption === undefined) {
-                                                    setFormValidated(true)
-                                                }
-                                                handleSubmit();
-                                            }}
+                                            onPress={() => handleSubmit()}
                                         >
-                                            <Text style={styles.submitText}>Enviar</Text>
+                                            {
+                                                !formValidated ? (
+                                                    <Text style={styles.submitText}>Sign Up</Text>
+                                                ) : (
+                                                
+                                                    <View style={{width: 45, height: 45}}>
+                                                        <LottieView resizeMode="cover" autoPlay source={require('../../assets/animated/spinner.json')} />
+                                                    </View>
+                                                )
+                                            }
                                         </TouchableOpacity>
                                     </>
                                 )
@@ -345,21 +339,16 @@ const styles = StyleSheet.create({
     container: {
         flex:1,
         alignItems: 'center',
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
         width: '100%',
         marginBottom: 20
 	},
 	containerLogo: {
+        flexDirection: "column",
 		justifyContent:'flex-start',
-		alignItems: 'center'
+		alignItems: 'flex-start',
+        padding: "5%"
 	},
-    containerLogoHeader: {
-        fontSize: 20, 
-        fontFamily: 'Inter_300Light',
-        textAlign: 'center',
-        paddingStart: 10,
-        paddingEnd: 10
-    },
 	submitText:{
 		color: '#FFF',
 		fontSize: 18,
@@ -372,7 +361,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,
-        marginTop: 15,
+        marginTop: "10%",
         elevation: 3
     },
     errorsContainer: {
@@ -382,7 +371,8 @@ const styles = StyleSheet.create({
     },
     errors: {
         fontFamily: 'Inter_600SemiBold',
-		color: colors.darkRed,
-        textAlign: 'left'
+		color: colors.lightRed,
+        textAlign: 'left',
+        marginStart: 5
     }
 });

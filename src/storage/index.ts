@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export function storeUserInfo(id: string, name: string, email: string, token: string) {
-    AsyncStorage.setItem('@reactbank:userinfo', JSON.stringify({id, name, email, token}));
+export function storeUserInfo(userData: any) {
+    AsyncStorage.setItem('@reactbank:userinfo', JSON.stringify({...userData}));
 }
 
 export async function getUserInfoFromStorage() {

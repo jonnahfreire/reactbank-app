@@ -8,8 +8,6 @@ import SignUp from '../screens/AuthScreens/SignUpScreen';
 import Recover from '../screens/AuthScreens/RecoverScreen';
 
 import CustomHeader from '../components/CustomHeader';
-import UsageTerms from '../screens/AuthScreens/UsageTerms';
-import { HeaderBackground } from '../components/HeaderBackground';
 import { colors } from '../assets/colors/Colors';
 
 const Stack = createNativeStackNavigator();
@@ -29,7 +27,7 @@ export default function AuthStack() {
                 options={{ headerTitle: ()=> <CustomHeader iconColor='#CCC' />, headerStyle: {backgroundColor: colors.bgColor}, ...headerOptions}}
             />
             <Stack.Screen name="Recover" component={Recover} 
-                options={{headerTitle: ()=> <CustomHeader />, ...headerOptions}}
+                options={{headerTitle: ()=> <CustomHeader iconColor='#CCC'/>, headerStyle: {backgroundColor: colors.bgColor}, ...headerOptions}}
             />
         </Stack.Navigator>
     );

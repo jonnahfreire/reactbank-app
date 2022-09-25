@@ -12,11 +12,9 @@ export const loginValidationSchema = yup.object().shape({
 
 
 export const signupValidationSchema = yup.object().shape({
-    name: yup.string().required("Informe seu nome completo")
-    .required("Insira seu nome completo"),
+    username: yup.string().required("Informe seu nome completo").required("Insira seu nome completo"),
     email: yup.string()
-        .email('Insira um email válido')
-        .required("Insira um email"),
+        .email('Insira um email válido').required("Insira um email"),
     cpf: yup.string()
         .required("Insira números separados por pontos e traço - Ex. 000.000.000-00")
         .matches(/\d{3}\.\d{3}\.\d{3}\-\d{2}$/, "Insira um CPF válido, no formato 000.000.000-00"),
@@ -37,7 +35,17 @@ export const signupValidationSchema = yup.object().shape({
 })
 
 export const passRecoverValidationSchema = yup.object().shape({
+    name: yup.string().required("Informe seu nome completo").required("Insira seu nome completo"),
     email: yup.string()
-        .email('Insira um email válido')
-        .required("Por favor insira um email")
+        .email('Insira um email válido').required("Insira um email"),
+    cpf: yup.string()
+        .required("Insira números separados por pontos e traço - Ex. 000.000.000-00")
+        .matches(/\d{3}\.\d{3}\.\d{3}\-\d{2}$/, "Insira um CPF válido, no formato 000.000.000-00")
+})
+
+export const cardValidationSchema = yup.object().shape({
+    name: yup.string().required("Informe seu nome completo").required("Insira seu nome completo"),
+    expiration: yup.string()
+        .required("Insira uma data no formato 00/00")
+        .matches(/\d{2}\/\d{2}$/, "Insira uma data válida, no formato 00/00"),
 })

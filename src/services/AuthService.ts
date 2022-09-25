@@ -1,9 +1,9 @@
-import { AuthData } from '../contexts/AuthContext';
+import { AuthData, ResetCredentialProps } from '../contexts/AuthContext';
 
-const baseUrl = "https://decola-app-api.herokuapp.com";
+const baseUrl = "https://darm-app-api.herokuapp.com";
 
 
-export async function firebaseSignIn(email: string, password: string) : Promise<AuthData> {
+export async function firebaseSignIn(cpf: string, password: string) : Promise<AuthData> {
     const options = {
         method: 'POST',
         headers: {
@@ -11,7 +11,7 @@ export async function firebaseSignIn(email: string, password: string) : Promise<
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            email: email, 
+            cpf: cpf, 
             password: password
         })
     }
@@ -24,17 +24,14 @@ export async function firebaseSignIn(email: string, password: string) : Promise<
     }
         
     const data = {
-        id: userCredential.id,
-        name: userCredential.username,
-        token: userCredential.token,
-        email: userCredential.email,
-        error: userCredential.code,
+        ...userCredential,
+        error: false
     }
     
     return data;
 }
 
-export async function firebaseSignUp(email: string, password: string, name: string) : Promise<AuthData> {
+export async function firebaseSignUp(signupData: any) : Promise<AuthData> {
     const options = {
         method: 'POST',
         headers: {
@@ -42,11 +39,10 @@ export async function firebaseSignUp(email: string, password: string, name: stri
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            email: email, 
-            password: password, 
-            username: name
+            ...signupData
         })
     }
+
     const response = await fetch(`${baseUrl}/signup`, options);
     const userCredential = await response.json();
 
@@ -55,16 +51,14 @@ export async function firebaseSignUp(email: string, password: string, name: stri
     }
     
     const data = {
-        id: userCredential.uuid,
-        name: userCredential.displayName,
-        email: userCredential.email,
-        error: userCredential.code,
+        ...userCredential,
+        error: false,
     }
     
     return data;
 }
 
-export async function resetPasswordViaEmailLink(email: string) {
+export async function resetPasswordViaEmailLink(email: string, cpf: string) : Promise<ResetCredentialProps> {
     const options = {
         method: 'POST',
         headers: {
@@ -72,8 +66,12 @@ export async function resetPasswordViaEmailLink(email: string) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            email: email
+            email: email,
+            cpf: cpf
         })
     }
-    return await fetch(`${baseUrl}/recover`, options);
+    const response = await fetch(`${baseUrl}/recover`, options);
+    const result = response.json();
+
+    return result;
 }
